@@ -2,9 +2,7 @@ package study.querydsl;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -457,5 +455,31 @@ public class QueryDslBasicTest {
                 .fetchOne();
 
         System.out.println("result = " + result);
+    }
+
+    @Test
+    public void simple_projection_test() {
+        List<String> result = queryFactory
+                .select(member.username)
+                .from(member)
+                .fetch();
+
+        for (String name : result) {
+            System.out.println("name = " + name);
+        }
+    }
+
+    @Test
+    public void tuple_projection_test() {
+        List<Tuple> tuples = queryFactory
+                .select(member.username, member.age)
+                .from(member)
+                .fetch();
+
+        for (Tuple tuple : tuples) {
+            String username = tuple.get(member.username);
+            Integer age = tuple.get(member.age);
+            System.out.println("username = " + username + ", age = " + age);
+        }
     }
 }
