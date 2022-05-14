@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberDto;
+import study.querydsl.dto.QMemberDto;
 import study.querydsl.dto.UserDto;
 import study.querydsl.entitiy.Member;
 import study.querydsl.entitiy.QMember;
@@ -203,9 +204,9 @@ public class QueryDslBasicTest {
 
         Tuple tuple = result.get(0);
         assertThat(tuple.get(member.count())).isEqualTo(4);
-        assertThat(tuple.get(member.age.sum())).isEqualTo(100);
-        assertThat(tuple.get(member.age.avg())).isEqualTo(25);
-        assertThat(tuple.get(member.age.max())).isEqualTo(40);
+        assertThat(tuple.get(member.age.sum())).isEqualTo(70);
+        assertThat(tuple.get(member.age.avg())).isEqualTo(17.5);
+        assertThat(tuple.get(member.age.max())).isEqualTo(20);
         assertThat(tuple.get(member.age.min())).isEqualTo(10);
     }
 
@@ -552,6 +553,18 @@ public class QueryDslBasicTest {
                 .fetch();
 
         for (MemberDto memberDto : memberDtoList) {
+            System.out.println("memberDto = " + memberDto);
+        }
+    }
+    
+    @Test
+    public void findDtoByQueryProjection() {
+        List<MemberDto> result = queryFactory
+                .select(new QMemberDto(member.username, member.age))
+                .from(member)
+                .fetch();
+
+        for (MemberDto memberDto : result) {
             System.out.println("memberDto = " + memberDto);
         }
     }
