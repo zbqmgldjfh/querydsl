@@ -1,6 +1,7 @@
 package study.querydsl.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -91,5 +92,54 @@ public class MemberJpaRepository {
                 .leftJoin(member.team, team)
                 .where(builder)
                 .fetch();
+    }
+
+    public List<MemberTeamDto> searchByWhereParams(MemberSearchCondition condition) {
+        return queryFactory
+                .select(new QMemberTeamDto(
+                                member.id,
+                                member.username,
+                                member.age,
+                                team.id,
+                                team.name
+                        )
+                )
+                .from(member)
+                .leftJoin(member.team, team)
+                .where(
+                        usernameEq(condition.getUsername()),
+                        teamNameEq(condition.getTeamName()),
+                        ageGoe(condition.getAgeGoe()),
+                        ageLoe(condition.getAgeLoe())
+                )
+                .fetch();
+    }
+
+    private BooleanBuilder usernameEq(String username) {
+        if(StringUtils.hasText(username)) {
+            return new BooleanBuilder(member.username.eq(username));
+        }
+        return new BooleanBuilder();
+    }
+
+    private BooleanBuilder teamNameEq(String teamName) {
+        if(StringUtils.hasText(teamName)) {
+            return new BooleanBuilder(team.name.eq(teamName));
+        }
+        return new BooleanBuilder();
+    }
+
+    private BooleanBuilder ageGoe(Integer ageGoe) {
+        if(ageGoe != null) {
+            return new BooleanBuilder(member.age.goe(ageGoe));
+        }
+        return new BooleanBuilder();
+    }
+
+    private BooleanBuilder ageLoe(Integer ageLoe) {
+        if(ageLoe != null) {
+            return new BooleanBuilder(member.age.loe(ageLoe));
+        }
+        return new BooleanBuilder();
     }
 }
